@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sortir Kartu Asesmen PJOK</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --malam:#0A1F44; --malam-2:#12306A; --listrik:#0066FF; --lampu:#FFC83D;
+  --kertas:#EEF3FA; --putih:#FFFFFF; --garis:#D5E2F7; --tinta:#16233B; --redup:#5B6B85;
+  --formatif:#0066FF; --sumatif:#0A1F44; --langgar:#E8590C;
+  --benar:#12A36B; --keliru:#E5484D;
+  --sans:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --angka:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+  --u:clamp(12px, 1.05vw, 20px);   /* satuan dasar: ikut lebar layar proyektor */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--kertas);color:var(--tinta);font-size:var(--u);line-height:1.4;overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+:focus-visible{outline:3px solid var(--lampu);outline-offset:2px}
+.sembunyi{display:none!important}
+
+.layar{height:100vh;display:grid;grid-template-rows:auto 1fr;gap:calc(var(--u)*.9);padding:calc(var(--u)*1.1) calc(var(--u)*1.4)}
+
+/* ---------- kepala ---------- */
+.kepala{display:flex;align-items:center;gap:calc(var(--u)*1)}
+.kepala h1{font-size:calc(var(--u)*2.1);line-height:1.05;letter-spacing:-.02em;font-weight:800;color:var(--malam)}
+.kepala .giliran{margin-left:auto;display:flex;align-items:baseline;gap:6px;background:var(--malam);color:#fff;border-radius:14px;padding:calc(var(--u)*.35) calc(var(--u)*.9)}
+.giliran b{font-family:var(--angka);font-size:calc(var(--u)*2.3);line-height:1;color:var(--lampu)}
+.giliran span{font-size:calc(var(--u)*.85);color:#BFD0EE}
+.alat{display:flex;gap:8px}
+.tbl{display:inline-flex;align-items:center;gap:6px;padding:calc(var(--u)*.55) calc(var(--u)*.95);border-radius:12px;font-weight:700;font-size:calc(var(--u)*.9);background:#fff;border:1.5px solid var(--garis);color:var(--malam);white-space:nowrap}
+.tbl:hover{border-color:var(--listrik)}
+.tbl-kunci{background:var(--lampu);border-color:var(--lampu);color:var(--malam)}
+.tbl-kunci:hover{border-color:#E0A800}
+.tbl:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- badan ---------- */
+.badan{display:grid;grid-template-columns:minmax(0,28fr) minmax(0,72fr);gap:calc(var(--u)*1.1);min-height:0}
+
+.tumpukan{background:var(--malam);color:#fff;border-radius:22px;padding:calc(var(--u)*1.1);display:flex;flex-direction:column;gap:calc(var(--u)*.8);min-height:0}
+.tumpukan h2{font-size:calc(var(--u)*1);font-weight:700;color:#BFD0EE}
+.slot-aktif{flex:1;display:flex;align-items:stretch;min-height:0}
+.kartu-aktif{flex:1;background:#fff;color:var(--tinta);border-radius:18px;padding:calc(var(--u)*1.2);display:flex;flex-direction:column;box-shadow:0 10px 0 rgba(0,0,0,.18);cursor:grab;touch-action:none;position:relative}
+.kartu-aktif:active{cursor:grabbing}
+.kartu-aktif.terpilih{outline:4px solid var(--lampu)}
+.kartu-aktif .kode{font-family:var(--angka);font-size:calc(var(--u)*3.4);line-height:.9;color:var(--listrik)}
+.kartu-aktif .teks{font-size:calc(var(--u)*1.7);font-weight:600;line-height:1.35;margin-top:calc(var(--u)*.6)}
+.kartu-aktif .geser{margin-top:auto;font-size:calc(var(--u)*.85);color:var(--redup);display:flex;align-items:center;gap:8px;padding-top:calc(var(--u)*.6)}
+.kartu-aktif .geser i{font-style:normal;font-size:calc(var(--u)*1.3)}
+.tumpukan-habis{flex:1;display:grid;place-items:center;text-align:center;border:2px dashed #3D5A92;border-radius:18px;padding:calc(var(--u)*1);color:#BFD0EE;font-size:calc(var(--u)*1.1)}
+.tumpukan-habis b{display:block;color:#fff;font-size:calc(var(--u)*1.5);margin-bottom:6px}
+
+.pemain label{display:block;font-size:calc(var(--u)*.85);color:#BFD0EE;margin-bottom:4px;font-weight:600}
+.pemain input{width:100%;padding:calc(var(--u)*.55) calc(var(--u)*.7);border-radius:10px;border:1.5px solid #3D5A92;background:var(--malam-2);color:#fff;font-size:calc(var(--u)*1.05)}
+.pemain input::placeholder{color:#8FA6CE}
+.pemain input:focus{outline:none;border-color:var(--lampu)}
+.sisa{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sisa span{font-size:calc(var(--u)*.85);color:#BFD0EE;margin-right:4px}
+.sisa button{font-family:var(--angka);font-size:calc(var(--u)*1.15);padding:2px 10px;border-radius:8px;background:var(--malam-2);color:#fff;border:1px solid #3D5A92}
+.sisa button[aria-current="true"]{background:var(--lampu);color:var(--malam);border-color:var(--lampu)}
+
+.kolom-wadah{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--u)*.9);min-height:0}
+.kolom{background:#fff;border:2px solid var(--garis);border-radius:22px;display:flex;flex-direction:column;min-height:0;transition:border-color .12s ease,background .12s ease}
+.kolom.sasaran{border-color:var(--lampu);background:#FFFBEF}
+.kolom.bisa-ketuk{border-style:dashed;border-color:var(--listrik);cursor:pointer}
+.kolom h3{color:#fff;font-size:calc(var(--u)*1.35);font-weight:800;letter-spacing:-.01em;padding:calc(var(--u)*.7) calc(var(--u)*1);border-radius:19px 19px 0 0;display:flex;align-items:center;gap:8px}
+.kolom h3 .jml{margin-left:auto;font-family:var(--angka);font-size:calc(var(--u)*1.6);line-height:1;opacity:.85}
+.kolom[data-k="F"] h3{background:var(--formatif)}
+.kolom[data-k="SU"] h3{background:var(--sumatif)}
+.kolom[data-k="M"] h3{background:var(--langgar)}
+.daftar{flex:1;overflow-y:auto;padding:calc(var(--u)*.7);display:flex;flex-direction:column;gap:calc(var(--u)*.6)}
+.daftar:empty::after{content:"Seret kartu ke sini";margin:auto;color:#A9B8D0;font-size:calc(var(--u)*1)}
+
+.kecil{background:var(--kertas);border:1.5px solid var(--garis);border-radius:14px;padding:calc(var(--u)*.6) calc(var(--u)*.75);cursor:grab;touch-action:none;position:relative;text-align:left;width:100%}
+.kecil .baris1{display:flex;align-items:center;gap:8px}
+.kecil .kode{font-family:var(--angka);font-size:calc(var(--u)*1.7);line-height:1;color:var(--malam)}
+.kecil .oleh{font-size:calc(var(--u)*.78);color:var(--redup);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.kecil .lencana{margin-left:auto;display:flex;gap:5px}
+.kecil .teks{font-size:calc(var(--u)*.95);line-height:1.3;margin-top:4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tanya{font-family:var(--angka);font-size:calc(var(--u)*1.2);line-height:1;background:var(--langgar);color:#fff;border-radius:7px;padding:1px 8px}
+.hasil{font-weight:800;font-size:calc(var(--u)*.95);border-radius:7px;padding:1px 8px;color:#fff}
+.kecil.benar{border-color:var(--benar);background:#E8F7F0}
+.kecil.benar .hasil{background:var(--benar)}
+.kecil.keliru{border-color:var(--keliru);background:#FDEDED}
+.kecil.keliru .hasil{background:var(--keliru)}
+.kecil .seharusnya{font-size:calc(var(--u)*.82);font-weight:700;color:var(--keliru);margin-top:4px}
+
+.bayang{position:fixed;z-index:50;pointer-events:none;transform:rotate(-2deg) scale(1.02);box-shadow:0 18px 40px rgba(10,31,68,.35);opacity:.96}
+.asal{opacity:.25}
+
+/* ---------- ringkasan kunci ---------- */
+.pita{position:fixed;left:50%;bottom:calc(var(--u)*1);transform:translateX(-50%);background:var(--malam);color:#fff;border-radius:16px;padding:calc(var(--u)*.7) calc(var(--u)*1.2);display:flex;gap:calc(var(--u)*1);align-items:center;font-size:calc(var(--u)*1.05);box-shadow:0 12px 30px rgba(10,31,68,.3);z-index:20;max-width:92vw}
+.pita b{font-family:var(--angka);font-size:calc(var(--u)*2);color:var(--lampu);line-height:1}
+
+/* ---------- dialog ---------- */
+dialog{border:none;border-radius:22px;padding:0;width:min(760px,90vw);color:var(--tinta);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,31,68,.55)}
+.dlg{padding:calc(var(--u)*1.5)}
+.dlg .kode{font-family:var(--angka);font-size:calc(var(--u)*3);line-height:.9;color:var(--listrik)}
+.dlg .teks{font-size:calc(var(--u)*1.4);font-weight:600;margin:10px 0 12px;line-height:1.35}
+.dlg .meta{color:var(--redup);font-size:calc(var(--u)*.95)}
+.dlg .alasan{margin-top:14px;border-radius:14px;padding:calc(var(--u)*.9) calc(var(--u)*1);font-size:calc(var(--u)*1.1)}
+.dlg .alasan.ok{background:#E8F7F0}
+.dlg .alasan.no{background:#FDEDED}
+.dlg .alasan b{display:block;margin-bottom:4px}
+.dlg .aksi{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.dlg .aksi .tbl{font-size:calc(var(--u)*.95)}
+.dlg .aksi .ke-F{background:var(--formatif);color:#fff;border-color:var(--formatif)}
+.dlg .aksi .ke-SU{background:var(--sumatif);color:#fff;border-color:var(--sumatif)}
+.dlg .aksi .ke-M{background:var(--langgar);color:#fff;border-color:var(--langgar)}
+.dlg .tutup{margin-left:auto}
+
+.bantuan{font-size:calc(var(--u)*.78);color:#8FA6CE;line-height:1.35}
+@media (max-width:760px){
+  body{overflow:auto}
+  .layar{height:auto}
+  .badan{grid-template-columns:1fr}
+  .kolom-wadah{grid-template-columns:1fr}
+  .kolom{min-height:220px}
+  .kepala{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="layar">
+  <header class="kepala">
+    <h1>Formatif, sumatif, atau melanggar garis?</h1>
+    <div class="giliran" aria-live="polite"><span>Giliran</span><b id="no-giliran">1</b><span id="dari-giliran">dari 8</span></div>
+    <div class="alat">
+      <button class="tbl" id="tbl-urung" title="Urungkan langkah terakhir (Ctrl+Z)">Urungkan</button>
+      <button class="tbl tbl-kunci" id="tbl-kunci">Buka kunci</button>
+      <button class="tbl" id="tbl-layar" title="Layar penuh (F)">Layar penuh</button>
+      <button class="tbl" id="tbl-ulang">Mulai ulang</button>
+    </div>
+  </header>
+
+  <main class="badan">
+    <aside class="tumpukan">
+      <h2>Kartu berikutnya</h2>
+      <div class="slot-aktif" id="slot-aktif"></div>
+      <div class="pemain">
+        <label for="nama-maju">Yang maju (opsional)</label>
+        <input id="nama-maju" maxlength="24" placeholder="Nama peserta" autocomplete="off">
+      </div>
+      <div class="sisa" id="sisa"></div>
+      <p class="bantuan">Seret kartu, atau ketuk kartu lalu ketuk kolom. Ketuk kartu yang sudah terpasang untuk detail dan kunci.</p>
+    </aside>
+
+    <section class="kolom-wadah" id="kolom-wadah">
+      <div class="kolom" data-k="F"><h3>Formatif<span class="jml" id="jml-F">0</span></h3><div class="daftar" id="daftar-F"></div></div>
+      <div class="kolom" data-k="SU"><h3>Sumatif<span class="jml" id="jml-SU">0</span></h3><div class="daftar" id="daftar-SU"></div></div>
+      <div class="kolom" data-k="M"><h3>Melanggar garis<span class="jml" id="jml-M">0</span></h3><div class="daftar" id="daftar-M"></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="pita sembunyi" id="pita" role="status"></div>
+
+<dialog id="dlg"><div class="dlg" id="dlg-isi"></div></dialog>
+
+<script>
+/* =====================================================================
+   KARTU — sama dengan lampiran slide 76. Ubah di sini jika kartu diubah.
+   ===================================================================== */
+const KOLOM = { F: "Formatif", SU: "Sumatif", M: "Melanggar garis" };
+const KARTU = [
+  { id: "K1", teks: "Sebelum materi lompat jauh, guru meminta anak melompat bebas dan mencatat siapa yang belum menolak dengan satu kaki.", kunci: "F",
+    alasan: "Ini asesmen awal: mengetahui kesiapan murid untuk menyesuaikan pembelajaran. Termasuk formatif." },
+  { id: "K2", teks: "Skor kuis kebugaran setiap pertemuan dirata-rata, lalu dimasukkan ke nilai rapor.", kunci: "M",
+    alasan: "Kuis harian adalah formatif. Merata-ratakannya ke rapor berarti menggabungkan formatif dan sumatif." },
+  { id: "K3", teks: "Setelah lingkup materi permainan invasi selesai, anak dinilai bermain 4 lawan 4 dengan rubrik. Hasilnya dipakai untuk rapor.", kunci: "SU",
+    alasan: "Menilai capaian setelah lingkup materi, dibandingkan dengan kriteria, untuk pelaporan. Ini sumatif." },
+  { id: "K4", teks: "Guru kelas I memberi tes pilihan ganda tentang nama anggota tubuh sebagai asesmen formatif.", kunci: "M",
+    alasan: "Pada Fase A, asesmen formatif dilakukan melalui observasi atau unjuk kerja, tidak menggunakan tes tulis." },
+  { id: "K5", teks: "Guru tidak mengadakan asesmen akhir semester karena data sumatif per lingkup materi sudah mencukupi.", kunci: "SU",
+    alasan: "Sah. Asesmen akhir semester bersifat pilihan jika data sudah mencukupi. Ini keleluasaan pendidik dalam asesmen sumatif." },
+  { id: "K6", teks: "Di tengah latihan, anak mencocokkan lemparannya dengan kartu tiga kriteria, lalu memperbaikinya.", kunci: "F",
+    alasan: "Asesmen di dalam proses dan dipakai murid sendiri untuk memperbaiki belajarnya. Formatif, sekaligus assessment as learning." },
+  { id: "K7", teks: "Hasil tes kebugaran di minggu pertama langsung dipakai sebagai nilai rapor karena anak sudah dites.", kunci: "M",
+    alasan: "Tes di awal adalah asesmen awal (formatif). Hasilnya untuk merancang pembelajaran, bukan untuk rapor." },
+  { id: "K8", teks: "Guru mengamati kerja sama kelompok saat bermain bentengan dan langsung memberi umpan balik tanpa mencatat angka.", kunci: "F",
+    alasan: "Observasi yang menyatu dengan pembelajaran dan menghasilkan umpan balik cepat. Formatif." }
+];
+const ACAK_AWAL = true;   // true: urutan kartu diacak setiap mulai ulang
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const KUNCI_SIMPAN = "sortirkartu:v1";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const kartu = id => KARTU.find(k => k.id === id);
+
+function stateBaru() {
+  const urutan = KARTU.map(k => k.id);
+  if (ACAK_AWAL) for (let i = urutan.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [urutan[i], urutan[j]] = [urutan[j], urutan[i]]; }
+  return { urutan, posisi: {}, oleh: {}, tanda: {}, ke: {}, kunciTerbuka: false, hitungTaruh: 0 };
+}
+let S = (() => { try { return JSON.parse(localStorage.getItem(KUNCI_SIMPAN)) || stateBaru(); } catch { return stateBaru(); } })();
+let riwayat = [];
+let terpilih = null;
+
+function simpan() { try { localStorage.setItem(KUNCI_SIMPAN, JSON.stringify(S)); } catch {} }
+function catat() { riwayat.push(JSON.stringify(S)); if (riwayat.length > 40) riwayat.shift(); }
+const diTumpukan = () => S.urutan.filter(id => !S.posisi[id]);
+
+/* =====================================================================
+   AKSI
+   ===================================================================== */
+function taruh(id, k) {
+  const lama = S.posisi[id] || null;
+  if (lama === k) return;
+  catat();
+  if (k) {
+    S.posisi[id] = k;
+    if (!lama) {
+      S.hitungTaruh++;
+      S.ke[id] = S.hitungTaruh;
+      const nama = $("nama-maju").value.trim();
+      if (nama) S.oleh[id] = nama;
+      $("nama-maju").value = "";
+    }
+  } else {
+    delete S.posisi[id]; delete S.oleh[id]; delete S.ke[id]; delete S.tanda[id];
+    S.urutan = [id, ...S.urutan.filter(x => x !== id)];
+  }
+  terpilih = null;
+  simpan(); gambar();
+}
+function lewati(id) {
+  catat();
+  S.urutan = [...S.urutan.filter(x => x !== id), id];
+  terpilih = null; simpan(); gambar();
+}
+function jadikanAktif(id) {
+  catat();
+  S.urutan = [id, ...S.urutan.filter(x => x !== id)];
+  terpilih = null; simpan(); gambar();
+}
+function alihTanda(id) { catat(); S.tanda[id] = !S.tanda[id]; simpan(); gambar(); }
+function urungkan() { if (!riwayat.length) return; S = JSON.parse(riwayat.pop()); terpilih = null; simpan(); gambar(); }
+
+/* =====================================================================
+   GAMBAR
+   ===================================================================== */
+function gambar() {
+  const sisa = diTumpukan();
+  const aktif = sisa[0];
+  const terpasang = KARTU.length - sisa.length;
+
+  $("no-giliran").textContent = Math.min(terpasang + 1, KARTU.length);
+  $("dari-giliran").textContent = sisa.length ? `dari ${KARTU.length}` : "selesai";
+
+  $("slot-aktif").innerHTML = aktif ? `
+    <div class="kartu-aktif ${terpilih === aktif ? "terpilih" : ""}" data-id="${aktif}" tabindex="0" role="button"
+         aria-label="Kartu ${aktif}. Seret ke kolom, atau tekan 1, 2, atau 3.">
+      <div class="kode">${aktif}</div>
+      <div class="teks">${esc(kartu(aktif).teks)}</div>
+      <div class="geser"><i>✋</i>Seret ke kolom yang tepat, lalu sebutkan satu alasan.</div>
+    </div>` : `
+    <div class="tumpukan-habis"><div><b>Semua kartu terpasang.</b>Masih ada yang ingin memindahkan kartu? Kalau sudah sepakat, buka kunci.</div></div>`;
+
+  $("sisa").innerHTML = sisa.length > 1
+    ? `<span>Sisa:</span>${sisa.map(id => `<button data-sisa="${id}" aria-current="${id === aktif}">${id}</button>`).join("")}
+       <button data-lewati="${aktif}" style="font-family:var(--sans);font-size:calc(var(--u)*.85)">Lewati</button>`
+    : "";
+
+  Object.keys(KOLOM).forEach(k => {
+    const ids = S.urutan.filter(id => S.posisi[id] === k).sort((a, b) => (S.ke[a] || 0) - (S.ke[b] || 0));
+    $("jml-" + k).textContent = ids.length;
+    $("daftar-" + k).innerHTML = ids.map(id => {
+      const c = kartu(id), cek = S.kunciTerbuka, benar = c.kunci === k;
+      return `<button class="kecil ${cek ? (benar ? "benar" : "keliru") : ""}" data-id="${id}">
+        <span class="baris1"><span class="kode">${id}</span>
+          <span class="oleh">${S.oleh[id] ? esc(S.oleh[id]) : ""}</span>
+          <span class="lencana">${S.tanda[id] ? `<span class="tanya" title="Diperdebatkan">?</span>` : ""}${cek ? `<span class="hasil">${benar ? "✓" : "✕"}</span>` : ""}</span></span>
+        <span class="teks">${esc(c.teks)}</span>
+        ${cek && !benar ? `<span class="seharusnya" style="display:block">Kunci: ${KOLOM[c.kunci]}</span>` : ""}
+      </button>`;
+    }).join("");
+  });
+
+  document.querySelectorAll(".kolom").forEach(el => el.classList.toggle("bisa-ketuk", !!terpilih));
+  $("tbl-kunci").textContent = S.kunciTerbuka ? "Tutup kunci" : "Buka kunci";
+  $("tbl-urung").disabled = !riwayat.length;
+  gambarPita();
+}
+
+function gambarPita() {
+  const pita = $("pita");
+  if (!S.kunciTerbuka) { pita.classList.add("sembunyi"); return; }
+  const terpasang = KARTU.filter(c => S.posisi[c.id]);
+  const tepat = terpasang.filter(c => S.posisi[c.id] === c.kunci);
+  const bahas = KARTU.filter(c => S.tanda[c.id] || (S.posisi[c.id] && S.posisi[c.id] !== c.kunci)).map(c => c.id);
+  pita.innerHTML = `<b>${tepat.length}/${KARTU.length}</b><span>kartu di kolom yang tepat.</span>
+    <span>${bahas.length ? "Bahas dulu: <strong>" + bahas.join(", ") + "</strong>" : "Tidak ada kartu yang keliru atau diperdebatkan."}</span>`;
+  pita.classList.remove("sembunyi");
+}
+
+/* =====================================================================
+   DIALOG DETAIL
+   ===================================================================== */
+function bukaDetail(id) {
+  const c = kartu(id), k = S.posisi[id];
+  const cek = S.kunciTerbuka, benar = c.kunci === k;
+  $("dlg-isi").innerHTML = `
+    <div class="kode">${id}</div>
+    <p class="teks">${esc(c.teks)}</p>
+    <p class="meta">Di kolom <b>${KOLOM[k]}</b>${S.oleh[id] ? `, dipasang oleh <b>${esc(S.oleh[id])}</b>` : ""}${S.ke[id] ? ` pada giliran ${S.ke[id]}` : ""}.</p>
+    ${cek ? `<div class="alasan ${benar ? "ok" : "no"}"><b>${benar ? "Tepat." : "Kunci: " + KOLOM[c.kunci] + "."}</b>${esc(c.alasan)}</div>` : ""}
+    <div class="aksi">
+      ${Object.keys(KOLOM).filter(x => x !== k).map(x => `<button class="tbl ke-${x}" data-pindah="${x}">Pindah ke ${KOLOM[x]}</button>`).join("")}
+      <button class="tbl" data-tanda>${S.tanda[id] ? "Hapus tanda ?" : "Tandai ?"}</button>
+      <button class="tbl" data-kembali>Kembalikan ke tumpukan</button>
+      <button class="tbl tutup" data-tutup>Tutup</button>
+    </div>`;
+  const d = $("dlg");
+  d.querySelectorAll("[data-pindah]").forEach(b => b.onclick = () => { taruh(id, b.dataset.pindah); d.close(); });
+  d.querySelector("[data-tanda]").onclick = () => { alihTanda(id); d.close(); };
+  d.querySelector("[data-kembali]").onclick = () => { taruh(id, null); d.close(); };
+  d.querySelector("[data-tutup]").onclick = () => d.close();
+  d.showModal();
+}
+$("dlg").addEventListener("click", e => { if (e.target === $("dlg")) $("dlg").close(); });
+
+/* =====================================================================
+   SERET (pointer events: mouse, sentuh, pena)
+   ===================================================================== */
+let seret = null;
+function kolomDi(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  const kol = el.closest(".kolom");
+  if (kol) return kol.dataset.k;
+  if (el.closest(".tumpukan")) return "TUMPUKAN";
+  return undefined;
+}
+document.addEventListener("pointerdown", e => {
+  const el = e.target.closest(".kartu-aktif, .kecil");
+  if (!el || e.button > 0) return;
+  seret = { el, id: el.dataset.id, x0: e.clientX, y0: e.clientY, aktif: false, bayang: null, dx: 0, dy: 0 };
+  el.setPointerCapture?.(e.pointerId);
+});
+document.addEventListener("pointermove", e => {
+  if (!seret) return;
+  const jarak = Math.hypot(e.clientX - seret.x0, e.clientY - seret.y0);
+  if (!seret.aktif && jarak > 8) {
+    const r = seret.el.getBoundingClientRect();
+    const b = seret.el.cloneNode(true);
+    b.classList.add("bayang"); b.classList.remove("terpilih");
+    Object.assign(b.style, { width: r.width + "px", height: r.height + "px", left: r.left + "px", top: r.top + "px" });
+    document.body.appendChild(b);
+    seret.el.classList.add("asal");
+    Object.assign(seret, { aktif: true, bayang: b, dx: e.clientX - r.left, dy: e.clientY - r.top });
+    if (seret.el.classList.contains("kartu-aktif")) {   // kartu besar mengecil saat diseret
+      const lebar = Math.min(r.width, document.querySelector(".kolom").getBoundingClientRect().width - 20);
+      b.style.width = lebar + "px"; b.style.height = "auto";
+      seret.dx = Math.min(seret.dx, lebar - 20); seret.dy = 30;
+    }
+  }
+  if (!seret.aktif) return;
+  seret.bayang.style.left = e.clientX - seret.dx + "px";
+  seret.bayang.style.top = e.clientY - seret.dy + "px";
+  const k = kolomDi(e.clientX, e.clientY);
+  document.querySelectorAll(".kolom").forEach(c => c.classList.toggle("sasaran", c.dataset.k === k));
+});
+function akhiriSeret(e, batal) {
+  if (!seret) return;
+  const s = seret; seret = null;
+  document.querySelectorAll(".kolom").forEach(c => c.classList.remove("sasaran"));
+  if (s.aktif) {
+    s.bayang.remove(); s.el.classList.remove("asal");
+    if (batal) return;
+    const k = kolomDi(e.clientX, e.clientY);
+    if (k === "TUMPUKAN") { if (S.posisi[s.id]) taruh(s.id, null); }
+    else if (k) taruh(s.id, k);
+    return;
+  }
+  // ketukan, bukan seretan
+  if (s.el.classList.contains("kartu-aktif")) { terpilih = terpilih === s.id ? null : s.id; gambar(); }
+  else bukaDetail(s.id);
+}
+document.addEventListener("pointerup", e => akhiriSeret(e, false));
+document.addEventListener("pointercancel", e => akhiriSeret(e, true));
+
+/* ketuk kolom setelah memilih kartu */
+document.querySelectorAll(".kolom").forEach(kol => kol.addEventListener("click", e => {
+  if (!terpilih || e.target.closest(".kecil")) return;
+  taruh(terpilih, kol.dataset.k);
+}));
+
+/* tombol sisa & lewati */
+$("sisa").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.sisa) jadikanAktif(b.dataset.sisa);
+  if (b.dataset.lewati) lewati(b.dataset.lewati);
+});
+
+/* =====================================================================
+   TOMBOL & PAPAN KETIK
+   ===================================================================== */
+$("tbl-urung").onclick = urungkan;
+$("tbl-kunci").onclick = () => {
+  const sisa = diTumpukan().length;
+  if (!S.kunciTerbuka && sisa && !confirm(`Masih ada ${sisa} kartu di tumpukan. Buka kunci sekarang?`)) return;
+  catat(); S.kunciTerbuka = !S.kunciTerbuka; simpan(); gambar();
+};
+$("tbl-ulang").onclick = () => {
+  if (!confirm("Mulai ulang? Semua kartu kembali ke tumpukan dan kunci ditutup.")) return;
+  catat(); S = stateBaru(); simpan(); gambar();
+};
+$("tbl-layar").onclick = () => {
+  if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.();
+};
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input") || $("dlg").open) return;
+  const aktif = diTumpukan()[0];
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); urungkan(); return; }
+  if (e.key.toLowerCase() === "f") { $("tbl-layar").click(); return; }
+  if (!aktif) return;
+  const peta = { "1": "F", "2": "SU", "3": "M" };
+  if (peta[e.key]) taruh(aktif, peta[e.key]);
+});
+window.addEventListener("storage", e => { if (e.key === KUNCI_SIMPAN && e.newValue) { S = JSON.parse(e.newValue); gambar(); } });
+
+gambar();
+</script>
+</body>
+</html>
