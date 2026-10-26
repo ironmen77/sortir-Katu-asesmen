@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A1F44">
 <title>Sortir Kartu Asesmen PJOK</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,31 +15,41 @@
   --kertas:#EEF3FA; --putih:#FFFFFF; --garis:#D5E2F7; --tinta:#16233B; --redup:#5B6B85;
   --formatif:#0066FF; --sumatif:#0A1F44; --langgar:#E8590C;
   --benar:#12A36B; --keliru:#E5484D;
+  --warna-tab:var(--formatif);
   --sans:"Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --angka:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
   --u:clamp(12px, 1.05vw, 20px);   /* satuan dasar: ikut lebar layar proyektor */
 }
+/* layar sentuh (tablet, papan interaktif): huruf sedikit lebih besar */
+@media (pointer:coarse){ :root{ --u:clamp(13px, 1.3vw, 20px) } }
+
 *{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%}
-body{font-family:var(--sans);background:var(--kertas);color:var(--tinta);font-size:var(--u);line-height:1.4;overflow:hidden;-webkit-font-smoothing:antialiased;user-select:none}
+body{font-family:var(--sans);background:var(--kertas);color:var(--tinta);font-size:var(--u);line-height:1.4;overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 button,input{font:inherit;color:inherit}
-button{cursor:pointer;border:none;background:none}
+button{cursor:pointer;border:none;background:none;touch-action:manipulation}
 :focus-visible{outline:3px solid var(--lampu);outline-offset:2px}
 .sembunyi{display:none!important}
+.u-sentuh{display:none}
+@media (pointer:coarse){ .u-sentuh{display:inline} .u-tetikus{display:none} }
+.sentuh .u-sentuh{display:inline} .sentuh .u-tetikus{display:none}
 
-.layar{height:100vh;display:grid;grid-template-rows:auto 1fr;gap:calc(var(--u)*.9);padding:calc(var(--u)*1.1) calc(var(--u)*1.4)}
+.layar{height:100vh;height:100dvh;display:grid;grid-template-rows:auto 1fr;gap:calc(var(--u)*.9);padding:calc(var(--u)*1.1) calc(var(--u)*1.4)}
 
 /* ---------- kepala ---------- */
 .kepala{display:flex;align-items:center;gap:calc(var(--u)*1)}
 .kepala h1{font-size:calc(var(--u)*2.1);line-height:1.05;letter-spacing:-.02em;font-weight:800;color:var(--malam)}
-.kepala .giliran{margin-left:auto;display:flex;align-items:baseline;gap:6px;background:var(--malam);color:#fff;border-radius:14px;padding:calc(var(--u)*.35) calc(var(--u)*.9)}
+.kepala .giliran{margin-left:auto;display:flex;align-items:baseline;gap:6px;background:var(--malam);color:#fff;border-radius:14px;padding:calc(var(--u)*.35) calc(var(--u)*.9);white-space:nowrap}
 .giliran b{font-family:var(--angka);font-size:calc(var(--u)*2.3);line-height:1;color:var(--lampu)}
 .giliran span{font-size:calc(var(--u)*.85);color:#BFD0EE}
 .alat{display:flex;gap:8px}
 .tbl{display:inline-flex;align-items:center;gap:6px;padding:calc(var(--u)*.55) calc(var(--u)*.95);border-radius:12px;font-weight:700;font-size:calc(var(--u)*.9);background:#fff;border:1.5px solid var(--garis);color:var(--malam);white-space:nowrap}
-.tbl:hover{border-color:var(--listrik)}
 .tbl-kunci{background:var(--lampu);border-color:var(--lampu);color:var(--malam)}
-.tbl-kunci:hover{border-color:#E0A800}
+@media (hover:hover){
+  .tbl:hover{border-color:var(--listrik)}
+  .tbl-kunci:hover{border-color:#E0A800}
+}
 .tbl:disabled{opacity:.45;cursor:not-allowed}
 
 /* ---------- badan ---------- */
@@ -47,7 +58,7 @@ button{cursor:pointer;border:none;background:none}
 .tumpukan{background:var(--malam);color:#fff;border-radius:22px;padding:calc(var(--u)*1.1);display:flex;flex-direction:column;gap:calc(var(--u)*.8);min-height:0}
 .tumpukan h2{font-size:calc(var(--u)*1);font-weight:700;color:#BFD0EE}
 .slot-aktif{flex:1;display:flex;align-items:stretch;min-height:0}
-.kartu-aktif{flex:1;background:#fff;color:var(--tinta);border-radius:18px;padding:calc(var(--u)*1.2);display:flex;flex-direction:column;box-shadow:0 10px 0 rgba(0,0,0,.18);cursor:grab;touch-action:none;position:relative}
+.kartu-aktif{flex:1;background:#fff;color:var(--tinta);border-radius:18px;padding:calc(var(--u)*1.2);display:flex;flex-direction:column;box-shadow:0 10px 0 rgba(0,0,0,.18);cursor:grab;touch-action:none;position:relative;transition:transform .25s ease}
 .kartu-aktif:active{cursor:grabbing}
 .kartu-aktif.terpilih{outline:4px solid var(--lampu)}
 .kartu-aktif .kode{font-family:var(--angka);font-size:calc(var(--u)*3.4);line-height:.9;color:var(--listrik)}
@@ -57,28 +68,48 @@ button{cursor:pointer;border:none;background:none}
 .tumpukan-habis{flex:1;display:grid;place-items:center;text-align:center;border:2px dashed #3D5A92;border-radius:18px;padding:calc(var(--u)*1);color:#BFD0EE;font-size:calc(var(--u)*1.1)}
 .tumpukan-habis b{display:block;color:#fff;font-size:calc(var(--u)*1.5);margin-bottom:6px}
 
+/* tombol pilih kolom: muncul di layar sentuh / layar kecil */
+.pilih{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pilih button{min-height:max(46px,calc(var(--u)*3.1));border-radius:12px;color:#fff;font-weight:800;font-size:calc(var(--u)*.95);line-height:1.15;padding:6px 8px;border:2px solid transparent;transition:transform .1s ease}
+.pilih [data-pilih="F"]{background:var(--formatif)}
+.pilih [data-pilih="SU"]{background:var(--sumatif);border-color:#7C95C4}
+.pilih [data-pilih="M"]{background:var(--langgar)}
+.pilih button:active{transform:translateY(2px)}
+.pilih button.sasaran{outline:4px solid var(--lampu);outline-offset:2px}
+@media (pointer:coarse), (max-width:1024px), (max-height:560px){ .pilih{display:grid} }
+.sentuh .pilih{display:grid}
+
 .pemain label{display:block;font-size:calc(var(--u)*.85);color:#BFD0EE;margin-bottom:4px;font-weight:600}
-.pemain input{width:100%;padding:calc(var(--u)*.55) calc(var(--u)*.7);border-radius:10px;border:1.5px solid #3D5A92;background:var(--malam-2);color:#fff;font-size:calc(var(--u)*1.05)}
+.pemain input{width:100%;padding:calc(var(--u)*.55) calc(var(--u)*.7);border-radius:10px;border:1.5px solid #3D5A92;background:var(--malam-2);color:#fff;font-size:max(16px, calc(var(--u)*1.05));-webkit-user-select:text;user-select:text}
 .pemain input::placeholder{color:#8FA6CE}
 .pemain input:focus{outline:none;border-color:var(--lampu)}
 .sisa{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .sisa span{font-size:calc(var(--u)*.85);color:#BFD0EE;margin-right:4px}
 .sisa button{font-family:var(--angka);font-size:calc(var(--u)*1.15);padding:2px 10px;border-radius:8px;background:var(--malam-2);color:#fff;border:1px solid #3D5A92}
 .sisa button[aria-current="true"]{background:var(--lampu);color:var(--malam);border-color:var(--lampu)}
+@media (pointer:coarse){ .sisa button{min-height:36px;min-width:42px} }
 
 .kolom-wadah{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:calc(var(--u)*.9);min-height:0}
+.kolom-wadah[data-tab="SU"]{--warna-tab:var(--sumatif)}
+.kolom-wadah[data-tab="M"]{--warna-tab:var(--langgar)}
 .kolom{background:#fff;border:2px solid var(--garis);border-radius:22px;display:flex;flex-direction:column;min-height:0;transition:border-color .12s ease,background .12s ease}
 .kolom.sasaran{border-color:var(--lampu);background:#FFFBEF}
 .kolom.bisa-ketuk{border-style:dashed;border-color:var(--listrik);cursor:pointer}
-.kolom h3{color:#fff;font-size:calc(var(--u)*1.35);font-weight:800;letter-spacing:-.01em;padding:calc(var(--u)*.7) calc(var(--u)*1);border-radius:19px 19px 0 0;display:flex;align-items:center;gap:8px}
+.kolom h3{color:#fff;font-size:calc(var(--u)*1.35);font-weight:800;letter-spacing:-.01em;padding:calc(var(--u)*.7) calc(var(--u)*1);border-radius:19px 19px 0 0;display:flex;align-items:center;gap:8px;transition:opacity .15s ease}
+.kolom h3 .nsalah{margin-left:auto;font-family:var(--angka);font-size:calc(var(--u)*1.1);line-height:1.3;background:var(--keliru);color:#fff;border-radius:7px;padding:0 7px}
+.kolom h3 .nsalah[hidden]{display:none}
 .kolom h3 .jml{margin-left:auto;font-family:var(--angka);font-size:calc(var(--u)*1.6);line-height:1;opacity:.85}
+.kolom h3 .nsalah:not([hidden]) + .jml{margin-left:4px}
 .kolom[data-k="F"] h3{background:var(--formatif)}
 .kolom[data-k="SU"] h3{background:var(--sumatif)}
 .kolom[data-k="M"] h3{background:var(--langgar)}
-.daftar{flex:1;overflow-y:auto;padding:calc(var(--u)*.7);display:flex;flex-direction:column;gap:calc(var(--u)*.6)}
+.kolom h3.denyut{animation:denyut .5s ease}
+@keyframes denyut{0%{transform:scale(1)}40%{transform:scale(1.05);filter:brightness(1.25)}100%{transform:scale(1)}}
+.daftar{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:calc(var(--u)*.7);display:flex;flex-direction:column;gap:calc(var(--u)*.6)}
 .daftar:empty::after{content:"Seret kartu ke sini";margin:auto;color:#A9B8D0;font-size:calc(var(--u)*1)}
+body.ada-pita .daftar{padding-bottom:calc(var(--u)*5)}
 
-.kecil{background:var(--kertas);border:1.5px solid var(--garis);border-radius:14px;padding:calc(var(--u)*.6) calc(var(--u)*.75);cursor:grab;touch-action:none;position:relative;text-align:left;width:100%}
+.kecil{background:var(--kertas);border:1.5px solid var(--garis);border-radius:14px;padding:calc(var(--u)*.6) calc(var(--u)*.75);cursor:grab;touch-action:pan-y;position:relative;text-align:left;width:100%;transition:transform .25s ease}
 .kecil .baris1{display:flex;align-items:center;gap:8px}
 .kecil .kode{font-family:var(--angka);font-size:calc(var(--u)*1.7);line-height:1;color:var(--malam)}
 .kecil .oleh{font-size:calc(var(--u)*.78);color:var(--redup);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -92,15 +123,22 @@ button{cursor:pointer;border:none;background:none}
 .kecil.keliru .hasil{background:var(--keliru)}
 .kecil .seharusnya{font-size:calc(var(--u)*.82);font-weight:700;color:var(--keliru);margin-top:4px}
 
-.bayang{position:fixed;z-index:50;pointer-events:none;transform:rotate(-2deg) scale(1.02);box-shadow:0 18px 40px rgba(10,31,68,.35);opacity:.96}
+/* tahan-lalu-seret di layar sentuh */
+.ditahan{transform:scale(.96)}
+.bayang{position:fixed;z-index:50;pointer-events:none;transform:rotate(-2deg) scale(1.02);box-shadow:0 18px 40px rgba(10,31,68,.35);opacity:.96;transition:none}
 .asal{opacity:.25}
+body.menyeret, body.menyeret *{cursor:grabbing!important}
 
 /* ---------- ringkasan kunci ---------- */
 .pita{position:fixed;left:50%;bottom:calc(var(--u)*1);transform:translateX(-50%);background:var(--malam);color:#fff;border-radius:16px;padding:calc(var(--u)*.7) calc(var(--u)*1.2);display:flex;gap:calc(var(--u)*1);align-items:center;font-size:calc(var(--u)*1.05);box-shadow:0 12px 30px rgba(10,31,68,.3);z-index:20;max-width:92vw}
 .pita b{font-family:var(--angka);font-size:calc(var(--u)*2);color:var(--lampu);line-height:1}
 
+/* ---------- kabar singkat (ponsel) ---------- */
+.kabar{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);z-index:30;background:var(--malam);color:#fff;border-radius:14px;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:12px;font-weight:700;font-size:calc(var(--u)*.95);box-shadow:0 12px 30px rgba(10,31,68,.35);max-width:calc(100vw - 24px);white-space:nowrap}
+.kabar button{background:var(--lampu);color:var(--malam);border-radius:10px;padding:7px 12px;font-weight:800}
+
 /* ---------- dialog ---------- */
-dialog{border:none;border-radius:22px;padding:0;width:min(760px,90vw);color:var(--tinta);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog{border:none;border-radius:22px;padding:0;width:min(760px,90vw);max-height:90dvh;color:var(--tinta);box-shadow:0 30px 80px rgba(0,0,0,.35)}
 dialog::backdrop{background:rgba(10,31,68,.55)}
 .dlg{padding:calc(var(--u)*1.5)}
 .dlg .kode{font-family:var(--angka);font-size:calc(var(--u)*3);line-height:.9;color:var(--listrik)}
@@ -118,15 +156,104 @@ dialog::backdrop{background:rgba(10,31,68,.55)}
 .dlg .tutup{margin-left:auto}
 
 .bantuan{font-size:calc(var(--u)*.78);color:#8FA6CE;line-height:1.35}
-@media (max-width:760px){
-  body{overflow:auto}
-  .layar{height:auto}
-  .badan{grid-template-columns:1fr}
-  .kolom-wadah{grid-template-columns:1fr}
-  .kolom{min-height:220px}
-  .kepala{flex-wrap:wrap}
+
+/* =====================================================================
+   TABLET TEGAK: kartu di atas, tiga kolom di bawah, semua muat satu layar
+   ===================================================================== */
+@media (min-width:641px) and (max-width:1024px) and (orientation:portrait){
+  :root{--u:clamp(13px, 1.75vw, 18px)}
+  .kepala{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px calc(var(--u)*1)}
+  .kepala h1{font-size:calc(var(--u)*1.7)}
+  .kepala .giliran{margin-left:0;align-self:center}
+  .alat{grid-column:1/-1;flex-wrap:wrap}
+  .badan{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  .tumpukan{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);grid-template-rows:auto auto auto auto 1fr;
+    grid-template-areas:"judul judul" "slot pilih" "slot pemain" "slot sisa" "slot bantuan";column-gap:calc(var(--u)*1.1)}
+  .tumpukan h2{grid-area:judul}
+  .slot-aktif{grid-area:slot}
+  .pilih{grid-area:pilih}
+  .pemain{grid-area:pemain}
+  .sisa{grid-area:sisa}
+  .bantuan{grid-area:bantuan}
+  .kartu-aktif .kode{font-size:calc(var(--u)*2.6)}
+  .kartu-aktif .teks{font-size:calc(var(--u)*1.3)}
+  .kolom h3{font-size:calc(var(--u)*1.1)}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* =====================================================================
+   PONSEL: halaman bisa digulir, kolom menjadi tab
+   ===================================================================== */
+@media (max-width:640px){
+  :root{--u:14px}
+  body{overflow-x:hidden;overflow-y:auto}
+  .layar{height:auto;min-height:100dvh;grid-template-rows:auto auto;gap:12px;padding:12px max(12px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left))}
+  body.ada-pita .layar{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  .kepala{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+  .kepala h1{font-size:calc(var(--u)*1.3)}
+  .kepala .giliran{margin-left:0;align-self:start;padding:4px 10px}
+  .giliran b{font-size:calc(var(--u)*1.8)}
+  .alat{grid-column:1/-1;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+  .alat::-webkit-scrollbar{display:none}
+  .tbl{min-height:40px;padding:8px 12px;font-size:calc(var(--u)*.88)}
+
+  .badan{grid-template-columns:minmax(0,1fr);gap:12px}
+  .tumpukan{border-radius:18px;padding:12px;gap:10px}
+  .slot-aktif{flex:none}
+  .kartu-aktif{padding:14px 16px;touch-action:pan-y;box-shadow:0 6px 0 rgba(0,0,0,.18)}
+  .kartu-aktif .kode{font-size:calc(var(--u)*2.3)}
+  .kartu-aktif .teks{font-size:calc(var(--u)*1.2);margin-top:6px}
+  .kartu-aktif .geser{padding-top:10px}
+  .tumpukan-habis{padding:18px 14px}
+  .pilih button{font-size:calc(var(--u)*.92)}
+
+  /* kolom → tab */
+  .kolom-wadah{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto auto;gap:0 6px}
+  .kolom{display:contents}
+  .kolom h3{grid-row:1;font-size:calc(var(--u)*.92);line-height:1.15;padding:10px 8px;min-height:54px;border-radius:14px 14px 0 0;opacity:.45;cursor:pointer;flex-wrap:wrap;gap:4px}
+  .kolom[data-k="F"] h3{grid-column:1}
+  .kolom[data-k="SU"] h3{grid-column:2}
+  .kolom[data-k="M"] h3{grid-column:3}
+  .kolom h3 .jml{font-size:calc(var(--u)*1.4)}
+  .kolom.tab-aktif h3{opacity:1}
+  .kolom.bisa-ketuk h3{opacity:.9;outline:2px dashed rgba(255,255,255,.85);outline-offset:-5px}
+  .kolom.sasaran h3{opacity:1;outline:3px solid var(--lampu);outline-offset:-3px}
+  .daftar{grid-column:1/-1;grid-row:2;display:none;overflow:visible;flex:none;min-height:180px;padding:10px;background:#fff;border:2px solid var(--garis);border-top:4px solid var(--warna-tab);border-radius:0 0 18px 18px}
+  .kolom.tab-aktif .daftar{display:flex}
+  .daftar:empty::after{content:"Belum ada kartu di kolom ini."}
+  body.ada-pita .daftar{padding-bottom:10px}
+  .kecil{padding:10px 12px}
+  .kecil .teks{display:block;-webkit-line-clamp:unset;overflow:visible}
+
+  .pita{left:12px;right:12px;transform:none;max-width:none;bottom:calc(10px + env(safe-area-inset-bottom));flex-wrap:wrap;gap:4px 10px;font-size:calc(var(--u)*.9);padding:10px 14px}
+
+  /* dialog jadi lembar bawah */
+  dialog{width:100%;max-width:100%;margin:auto 0 0;border-radius:22px 22px 0 0;max-height:88dvh}
+  .dlg{padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+  .dlg .teks{font-size:calc(var(--u)*1.2)}
+  .dlg .aksi{display:grid;grid-template-columns:1fr 1fr}
+  .dlg .aksi .tbl{justify-content:center;text-align:center;white-space:normal;min-height:46px}
+  .dlg .tutup{margin-left:0;grid-column:1/-1}
+}
+
+/* =====================================================================
+   LAYAR PENDEK (ponsel miring): tata letak samping-menyamping, bisa digulir
+   ===================================================================== */
+@media (min-width:641px) and (max-height:560px){
+  body{overflow-y:auto}
+  .layar{height:auto;min-height:100dvh}
+  body.ada-pita .layar{padding-bottom:calc(var(--u)*6)}
+  .kepala h1{font-size:calc(var(--u)*1.45)}
+  .kartu-aktif{touch-action:pan-y}
+  .kartu-aktif .kode{font-size:calc(var(--u)*2.2)}
+  .kartu-aktif .teks{font-size:calc(var(--u)*1.15)}
+  .slot-aktif{flex:none}
+  .pilih{grid-template-columns:minmax(0,1fr);gap:6px}
+  .pilih button{min-height:40px}
+  .kolom{min-height:75dvh}
+  .daftar{overflow:visible}
+}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -146,23 +273,32 @@ dialog::backdrop{background:rgba(10,31,68,.55)}
     <aside class="tumpukan">
       <h2>Kartu berikutnya</h2>
       <div class="slot-aktif" id="slot-aktif"></div>
+      <div class="pilih" id="pilih" role="group" aria-label="Taruh kartu ini di kolom">
+        <button data-pilih="F">Formatif</button>
+        <button data-pilih="SU">Sumatif</button>
+        <button data-pilih="M">Melanggar garis</button>
+      </div>
       <div class="pemain">
         <label for="nama-maju">Yang maju (opsional)</label>
         <input id="nama-maju" maxlength="24" placeholder="Nama peserta" autocomplete="off">
       </div>
       <div class="sisa" id="sisa"></div>
-      <p class="bantuan">Seret kartu, atau ketuk kartu lalu ketuk kolom. Ketuk kartu yang sudah terpasang untuk detail dan kunci.</p>
+      <p class="bantuan">
+        <span class="u-tetikus">Seret kartu, atau ketuk kartu lalu ketuk kolom (tombol 1, 2, 3 juga bisa). Ketuk kartu yang sudah terpasang untuk detail dan kunci.</span>
+        <span class="u-sentuh">Ketuk tombol kolom, atau seret kartunya. Kartu yang sudah terpasang: ketuk untuk detail, tahan sebentar lalu seret untuk memindahkan.</span>
+      </p>
     </aside>
 
-    <section class="kolom-wadah" id="kolom-wadah">
-      <div class="kolom" data-k="F"><h3>Formatif<span class="jml" id="jml-F">0</span></h3><div class="daftar" id="daftar-F"></div></div>
-      <div class="kolom" data-k="SU"><h3>Sumatif<span class="jml" id="jml-SU">0</span></h3><div class="daftar" id="daftar-SU"></div></div>
-      <div class="kolom" data-k="M"><h3>Melanggar garis<span class="jml" id="jml-M">0</span></h3><div class="daftar" id="daftar-M"></div></div>
+    <section class="kolom-wadah" id="kolom-wadah" data-tab="F">
+      <div class="kolom" data-k="F"><h3><span>Formatif</span><span class="nsalah" id="salah-F" hidden></span><span class="jml" id="jml-F">0</span></h3><div class="daftar" id="daftar-F"></div></div>
+      <div class="kolom" data-k="SU"><h3><span>Sumatif</span><span class="nsalah" id="salah-SU" hidden></span><span class="jml" id="jml-SU">0</span></h3><div class="daftar" id="daftar-SU"></div></div>
+      <div class="kolom" data-k="M"><h3><span>Melanggar garis</span><span class="nsalah" id="salah-M" hidden></span><span class="jml" id="jml-M">0</span></h3><div class="daftar" id="daftar-M"></div></div>
     </section>
   </main>
 </div>
 
 <div class="pita sembunyi" id="pita" role="status"></div>
+<div class="kabar sembunyi" id="kabar" role="status"><span id="kabar-teks"></span><button id="kabar-urung">Urungkan</button></div>
 
 <dialog id="dlg"><div class="dlg" id="dlg-isi"></div></dialog>
 
@@ -198,6 +334,9 @@ const KUNCI_SIMPAN = "sortirkartu:v1";
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const kartu = id => KARTU.find(k => k.id === id);
+const PONSEL = window.matchMedia("(max-width: 640px)");
+/* tandai perangkat layar sentuh agar petunjuk & tombol kolom menyesuaikan */
+if (window.matchMedia("(pointer:coarse)").matches || navigator.maxTouchPoints > 0) document.documentElement.classList.add("sentuh");
 
 function stateBaru() {
   const urutan = KARTU.map(k => k.id);
@@ -207,6 +346,8 @@ function stateBaru() {
 let S = (() => { try { return JSON.parse(localStorage.getItem(KUNCI_SIMPAN)) || stateBaru(); } catch { return stateBaru(); } })();
 let riwayat = [];
 let terpilih = null;
+let tab = "F";          // tab kolom yang terbuka (hanya terlihat di ponsel)
+let baruJatuh = 0;      // cegah "klik hantu" setelah kartu dijatuhkan
 
 function simpan() { try { localStorage.setItem(KUNCI_SIMPAN, JSON.stringify(S)); } catch {} }
 function catat() { riwayat.push(JSON.stringify(S)); if (riwayat.length > 40) riwayat.shift(); }
@@ -234,6 +375,7 @@ function taruh(id, k) {
   }
   terpilih = null;
   simpan(); gambar();
+  if (k) umpanBalik(id, k);
 }
 function lewati(id) {
   catat();
@@ -248,6 +390,21 @@ function jadikanAktif(id) {
 function alihTanda(id) { catat(); S.tanda[id] = !S.tanda[id]; simpan(); gambar(); }
 function urungkan() { if (!riwayat.length) return; S = JSON.parse(riwayat.pop()); terpilih = null; simpan(); gambar(); }
 
+/* umpan balik setelah kartu ditaruh */
+let jedaKabar = 0;
+function umpanBalik(id, k) {
+  const h = document.querySelector(`.kolom[data-k="${k}"] h3`);
+  if (h) { h.classList.remove("denyut"); void h.offsetWidth; h.classList.add("denyut"); }
+  if (PONSEL.matches && tab !== k) kabar(`${id} masuk ${KOLOM[k]}`);
+}
+function kabar(teks) {
+  $("kabar-teks").textContent = teks;
+  $("kabar").classList.remove("sembunyi");
+  clearTimeout(jedaKabar);
+  jedaKabar = setTimeout(() => $("kabar").classList.add("sembunyi"), 2600);
+}
+$("kabar-urung").onclick = () => { urungkan(); clearTimeout(jedaKabar); $("kabar").classList.add("sembunyi"); };
+
 /* =====================================================================
    GAMBAR
    ===================================================================== */
@@ -255,6 +412,7 @@ function gambar() {
   const sisa = diTumpukan();
   const aktif = sisa[0];
   const terpasang = KARTU.length - sisa.length;
+  if (terpilih && terpilih !== aktif) terpilih = null;
 
   $("no-giliran").textContent = Math.min(terpasang + 1, KARTU.length);
   $("dari-giliran").textContent = sisa.length ? `dari ${KARTU.length}` : "selesai";
@@ -264,9 +422,10 @@ function gambar() {
          aria-label="Kartu ${aktif}. Seret ke kolom, atau tekan 1, 2, atau 3.">
       <div class="kode">${aktif}</div>
       <div class="teks">${esc(kartu(aktif).teks)}</div>
-      <div class="geser"><i>✋</i>Seret ke kolom yang tepat, lalu sebutkan satu alasan.</div>
+      <div class="geser"><i>✋</i><span class="u-tetikus">Seret ke kolom yang tepat, lalu sebutkan satu alasan.</span><span class="u-sentuh">Pilih kolomnya, lalu sebutkan satu alasan.</span></div>
     </div>` : `
     <div class="tumpukan-habis"><div><b>Semua kartu terpasang.</b>Masih ada yang ingin memindahkan kartu? Kalau sudah sepakat, buka kunci.</div></div>`;
+  $("pilih").classList.toggle("sembunyi", !aktif);
 
   $("sisa").innerHTML = sisa.length > 1
     ? `<span>Sisa:</span>${sisa.map(id => `<button data-sisa="${id}" aria-current="${id === aktif}">${id}</button>`).join("")}
@@ -275,9 +434,13 @@ function gambar() {
 
   Object.keys(KOLOM).forEach(k => {
     const ids = S.urutan.filter(id => S.posisi[id] === k).sort((a, b) => (S.ke[a] || 0) - (S.ke[b] || 0));
+    const cek = S.kunciTerbuka;
     $("jml-" + k).textContent = ids.length;
+    const nSalah = cek ? ids.filter(id => kartu(id).kunci !== k).length : 0;
+    $("salah-" + k).hidden = !nSalah;
+    $("salah-" + k).textContent = "✕" + nSalah;
     $("daftar-" + k).innerHTML = ids.map(id => {
-      const c = kartu(id), cek = S.kunciTerbuka, benar = c.kunci === k;
+      const c = kartu(id), benar = c.kunci === k;
       return `<button class="kecil ${cek ? (benar ? "benar" : "keliru") : ""}" data-id="${id}">
         <span class="baris1"><span class="kode">${id}</span>
           <span class="oleh">${S.oleh[id] ? esc(S.oleh[id]) : ""}</span>
@@ -288,7 +451,11 @@ function gambar() {
     }).join("");
   });
 
-  document.querySelectorAll(".kolom").forEach(el => el.classList.toggle("bisa-ketuk", !!terpilih));
+  $("kolom-wadah").dataset.tab = tab;
+  document.querySelectorAll(".kolom").forEach(el => {
+    el.classList.toggle("bisa-ketuk", !!terpilih);
+    el.classList.toggle("tab-aktif", el.dataset.k === tab);
+  });
   $("tbl-kunci").textContent = S.kunciTerbuka ? "Tutup kunci" : "Buka kunci";
   $("tbl-urung").disabled = !riwayat.length;
   gambarPita();
@@ -296,6 +463,7 @@ function gambar() {
 
 function gambarPita() {
   const pita = $("pita");
+  document.body.classList.toggle("ada-pita", !!S.kunciTerbuka);
   if (!S.kunciTerbuka) { pita.classList.add("sembunyi"); return; }
   const terpasang = KARTU.filter(c => S.posisi[c.id]);
   const tepat = terpasang.filter(c => S.posisi[c.id] === c.kunci);
@@ -310,6 +478,7 @@ function gambarPita() {
    ===================================================================== */
 function bukaDetail(id) {
   const c = kartu(id), k = S.posisi[id];
+  if (!c || !k) return;
   const cek = S.kunciTerbuka, benar = c.kunci === k;
   $("dlg-isi").innerHTML = `
     <div class="kode">${id}</div>
@@ -323,7 +492,7 @@ function bukaDetail(id) {
       <button class="tbl tutup" data-tutup>Tutup</button>
     </div>`;
   const d = $("dlg");
-  d.querySelectorAll("[data-pindah]").forEach(b => b.onclick = () => { taruh(id, b.dataset.pindah); d.close(); });
+  d.querySelectorAll("[data-pindah]").forEach(b => b.onclick = () => { d.close(); taruh(id, b.dataset.pindah); });
   d.querySelector("[data-tanda]").onclick = () => { alihTanda(id); d.close(); };
   d.querySelector("[data-kembali]").onclick = () => { taruh(id, null); d.close(); };
   d.querySelector("[data-tutup]").onclick = () => d.close();
@@ -333,52 +502,114 @@ $("dlg").addEventListener("click", e => { if (e.target === $("dlg")) $("dlg").cl
 
 /* =====================================================================
    SERET (pointer events: mouse, sentuh, pena)
+   - Tetikus/pena: langsung seret.
+   - Sentuh pada kartu di area yang bisa digulir: tahan ±0,3 detik, lalu seret.
+     Gerakan cepat tanpa menahan = menggulir halaman/daftar seperti biasa.
+   - Sentuh pada kartu besar di layar yang tidak digulir (tablet): langsung seret.
    ===================================================================== */
+const TAHAN_MS = 300;
 let seret = null;
+
 function kolomDi(x, y) {
   const el = document.elementFromPoint(x, y);
-  if (!el) return null;
+  if (!el) return undefined;
+  const p = el.closest("[data-pilih]");
+  if (p) return p.dataset.pilih;
   const kol = el.closest(".kolom");
   if (kol) return kol.dataset.k;
   if (el.closest(".tumpukan")) return "TUMPUKAN";
   return undefined;
 }
+function tandaiSasaran(k) {
+  document.querySelectorAll(".kolom").forEach(c => c.classList.toggle("sasaran", c.dataset.k === k));
+  document.querySelectorAll("[data-pilih]").forEach(b => b.classList.toggle("sasaran", b.dataset.pilih === k));
+}
+
 document.addEventListener("pointerdown", e => {
+  if (seret) return;                                   // abaikan jari kedua
   const el = e.target.closest(".kartu-aktif, .kecil");
   if (!el || e.button > 0) return;
-  seret = { el, id: el.dataset.id, x0: e.clientX, y0: e.clientY, aktif: false, bayang: null, dx: 0, dy: 0 };
-  el.setPointerCapture?.(e.pointerId);
-});
-document.addEventListener("pointermove", e => {
-  if (!seret) return;
-  const jarak = Math.hypot(e.clientX - seret.x0, e.clientY - seret.y0);
-  if (!seret.aktif && jarak > 8) {
-    const r = seret.el.getBoundingClientRect();
-    const b = seret.el.cloneNode(true);
-    b.classList.add("bayang"); b.classList.remove("terpilih");
-    Object.assign(b.style, { width: r.width + "px", height: r.height + "px", left: r.left + "px", top: r.top + "px" });
-    document.body.appendChild(b);
-    seret.el.classList.add("asal");
-    Object.assign(seret, { aktif: true, bayang: b, dx: e.clientX - r.left, dy: e.clientY - r.top });
-    if (seret.el.classList.contains("kartu-aktif")) {   // kartu besar mengecil saat diseret
-      const lebar = Math.min(r.width, document.querySelector(".kolom").getBoundingClientRect().width - 20);
-      b.style.width = lebar + "px"; b.style.height = "auto";
-      seret.dx = Math.min(seret.dx, lebar - 20); seret.dy = 30;
-    }
+  const tunda = e.pointerType === "touch" && getComputedStyle(el).touchAction !== "none";
+  seret = { el, id: el.dataset.id, pid: e.pointerId, x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY,
+            siap: !tunda, aktif: false, bayang: null, dx: 0, dy: 0, timer: 0, raf: 0 };
+  if (tunda) {
+    el.classList.add("ditahan");
+    seret.timer = setTimeout(() => {
+      if (!seret || seret.el !== el) return;
+      seret.siap = true;
+      el.classList.remove("ditahan");
+      mulaiSeret();
+      navigator.vibrate?.(15);
+    }, TAHAN_MS);
   }
-  if (!seret.aktif) return;
-  seret.bayang.style.left = e.clientX - seret.dx + "px";
-  seret.bayang.style.top = e.clientY - seret.dy + "px";
-  const k = kolomDi(e.clientX, e.clientY);
-  document.querySelectorAll(".kolom").forEach(c => c.classList.toggle("sasaran", c.dataset.k === k));
+  try { el.setPointerCapture(e.pointerId); } catch {}
 });
+
+document.addEventListener("pointermove", e => {
+  if (!seret || e.pointerId !== seret.pid) return;
+  seret.x = e.clientX; seret.y = e.clientY;
+  if (!seret.aktif) {
+    const jarak = Math.hypot(e.clientX - seret.x0, e.clientY - seret.y0);
+    if (!seret.siap) { if (jarak > 10) lepasSeret(); return; }   // bergerak sebelum ditahan = menggulir
+    if (jarak <= 8) return;
+    mulaiSeret();
+  }
+  gerakBayang();
+});
+
+function mulaiSeret() {
+  const s = seret, r = s.el.getBoundingClientRect();
+  const b = s.el.cloneNode(true);
+  b.classList.add("bayang"); b.classList.remove("terpilih", "ditahan");
+  b.setAttribute("aria-hidden", "true"); b.removeAttribute("tabindex");
+  let lebar = r.width, dx = s.x0 - r.left, dy = s.y0 - r.top;
+  if (s.el.classList.contains("kartu-aktif")) {        // kartu besar mengecil saat diseret
+    const acuan = document.querySelector(".kolom h3").getBoundingClientRect().width;
+    lebar = Math.min(r.width, Math.max(220, acuan - 20));
+    dx = Math.min(dx, lebar - 20); dy = 30;
+    b.style.height = "auto";
+  } else b.style.height = r.height + "px";
+  Object.assign(b.style, { width: lebar + "px", left: s.x - dx + "px", top: s.y - dy + "px" });
+  document.body.appendChild(b);
+  s.el.classList.add("asal");
+  document.body.classList.add("menyeret");
+  Object.assign(s, { aktif: true, bayang: b, dx, dy });
+  s.raf = requestAnimationFrame(gulirOtomatis);
+  gerakBayang();
+}
+function gerakBayang() {
+  const s = seret; if (!s || !s.aktif) return;
+  s.bayang.style.left = s.x - s.dx + "px";
+  s.bayang.style.top = s.y - s.dy + "px";
+  tandaiSasaran(kolomDi(s.x, s.y));
+}
+/* gulir otomatis saat kartu dibawa ke tepi atas/bawah layar (ponsel) */
+function gulirOtomatis() {
+  const s = seret; if (!s || !s.aktif) return;
+  const tepi = Math.min(90, innerHeight * .15);
+  let v = 0;
+  if (s.y < tepi) v = -(tepi - s.y) / 4;
+  else if (s.y > innerHeight - tepi) v = (s.y - (innerHeight - tepi)) / 4;
+  v = Math.max(-22, Math.min(22, v));
+  if (v) { const awal = scrollY; scrollBy(0, v); if (scrollY !== awal) tandaiSasaran(kolomDi(s.x, s.y)); }
+  s.raf = requestAnimationFrame(gulirOtomatis);
+}
+function bersihkan(s) {
+  clearTimeout(s.timer); cancelAnimationFrame(s.raf);
+  s.el.classList.remove("ditahan", "asal");
+  s.bayang?.remove();
+  document.body.classList.remove("menyeret");
+  tandaiSasaran(null);
+}
+function lepasSeret() { if (!seret) return; const s = seret; seret = null; bersihkan(s); }
+
 function akhiriSeret(e, batal) {
-  if (!seret) return;
+  if (!seret || e.pointerId !== seret.pid) return;
   const s = seret; seret = null;
-  document.querySelectorAll(".kolom").forEach(c => c.classList.remove("sasaran"));
+  bersihkan(s);
+  if (batal) return;
   if (s.aktif) {
-    s.bayang.remove(); s.el.classList.remove("asal");
-    if (batal) return;
+    baruJatuh = Date.now();
     const k = kolomDi(e.clientX, e.clientY);
     if (k === "TUMPUKAN") { if (S.posisi[s.id]) taruh(s.id, null); }
     else if (k) taruh(s.id, k);
@@ -390,12 +621,24 @@ function akhiriSeret(e, batal) {
 }
 document.addEventListener("pointerup", e => akhiriSeret(e, false));
 document.addEventListener("pointercancel", e => akhiriSeret(e, true));
+/* selama menyeret dengan jari, halaman tidak ikut tergulir */
+document.addEventListener("touchmove", e => { if (seret && seret.aktif) e.preventDefault(); }, { passive: false });
+document.addEventListener("contextmenu", e => { if (e.target.closest(".kartu-aktif, .kecil")) e.preventDefault(); });
 
-/* ketuk kolom setelah memilih kartu */
+/* ketuk kolom: menaruh kartu terpilih, atau (di ponsel) membuka tab kolom */
 document.querySelectorAll(".kolom").forEach(kol => kol.addEventListener("click", e => {
-  if (!terpilih || e.target.closest(".kecil")) return;
-  taruh(terpilih, kol.dataset.k);
+  if (Date.now() - baruJatuh < 400 || e.target.closest(".kecil")) return;
+  if (terpilih) { taruh(terpilih, kol.dataset.k); return; }
+  if (e.target.closest("h3") && tab !== kol.dataset.k) { tab = kol.dataset.k; gambar(); }
 }));
+
+/* tombol pilih kolom */
+$("pilih").addEventListener("click", e => {
+  const b = e.target.closest("[data-pilih]");
+  const aktif = diTumpukan()[0];
+  if (!b || !aktif || Date.now() - baruJatuh < 400) return;
+  taruh(aktif, b.dataset.pilih);
+});
 
 /* tombol sisa & lewati */
 $("sisa").addEventListener("click", e => {
@@ -415,11 +658,20 @@ $("tbl-kunci").onclick = () => {
 };
 $("tbl-ulang").onclick = () => {
   if (!confirm("Mulai ulang? Semua kartu kembali ke tumpukan dan kunci ditutup.")) return;
-  catat(); S = stateBaru(); simpan(); gambar();
+  catat(); S = stateBaru(); tab = "F"; simpan(); gambar();
 };
+
+/* layar penuh: disembunyikan di peramban yang tidak mendukung (mis. iPhone) */
+const akar = document.documentElement;
+const mintaPenuh = akar.requestFullscreen || akar.webkitRequestFullscreen;
+const keluarPenuh = document.exitFullscreen || document.webkitExitFullscreen;
+if (!mintaPenuh) $("tbl-layar").classList.add("sembunyi");
 $("tbl-layar").onclick = () => {
-  if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.();
+  if (!mintaPenuh) return;
+  if (document.fullscreenElement || document.webkitFullscreenElement) keluarPenuh?.call(document);
+  else { const p = mintaPenuh.call(akar); p?.catch?.(() => {}); }
 };
+
 document.addEventListener("keydown", e => {
   if (e.target.matches("input") || $("dlg").open) return;
   const aktif = diTumpukan()[0];
